@@ -6,12 +6,12 @@ from pprint import pformat
 import datetime
 from typing import Optional
 
-import pymsteams
+import requests
 import friendly_traceback
 friendly_traceback.exclude_file_from_traceback(__file__)
 
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __version_info__ = tuple(int(i) if i.isdigit() else i for i in __version__.split('.'))
 
 
@@ -43,10 +43,33 @@ kwargs: {kwargs}
 """.strip()
 
 
+adaptive_card_template = """
+{{
+  "type": "message",
+  "attachments": [
+    {{
+      "contentType": "application/vnd.microsoft.card.adaptive",
+      "contentUrl": null,
+      "content": {{
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "body": [
+          {{
+            "type": "TextBlock",
+            "text": "{content}"
+          }}
+        ]
+      }}
+    }}
+  ]
+}}
+""".strip()
+
 DEBUG = False
 
 
-#%%
+##
 def post_simple_teams_message(message: str, webhook_url: Optional[str] = None):
     """
     Post a simple, text-based message to an MS Teams channel via a webhook.  If webhook_url is unspecified,
@@ -66,12 +89,13 @@ def post_simple_teams_message(message: str, webhook_url: Optional[str] = None):
         print('=' * 50)
         print('\n')
     else:
-        msg = pymsteams.connectorcard(webhook_url)
-        msg.text(message)
-        msg.send()
+        data = adaptive_card_template.format(content=message)
+        headers = {"Content-Type": "application/json"}
+        response = requests.post(webhook_url, data=data, headers=headers)
+        return response
 
 
-#%%
+##
 def notify_exceptions(func: Optional[callable] = None, *, webhook_url: Optional[str] = None,
                       template: Optional[str] = None):
     """
@@ -123,7 +147,7 @@ def notify_exceptions(func: Optional[callable] = None, *, webhook_url: Optional[
     return wrapper_notify_exceptions
 
 
-#%%
+##
 def notify_complete(func: Optional[callable] = None, *, webhook_url: Optional[str] = None,
                     template: Optional[str] = None):
     """

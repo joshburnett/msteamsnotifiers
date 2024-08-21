@@ -1,2 +1,2 @@
-pymsteams
+requests
 friendly_traceback

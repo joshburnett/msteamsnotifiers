@@ -1,9 +1,10 @@
 msteamsnotifiers: Decorators for automatically notifying an MS Teams channel of events
 ======================================================================================
 
-`msteamsnotifiers` makes it easy to automatically send notifications to a channel in MS Teams.
+`msteamsnotifiers` makes it easy to automatically send notifications to a channel in MS Teams from Python.
 
-Based on the excellent [`pymsteams`](https://pypi.org/project/pymsteams/), this library uses Webhook Connectors for Microsoft Teams. You will need the webhook URL for your channel. Please visit [this Microsoft documentation](https://dev.outlook.com/Connectors/GetStarted#creating-messages-through-office-365-connectors-in-microsoft-teams) for instructions on how to obtain the correct URL.  Sometimes the screenshots in this documentation are not 100% up-to-date, but [this other Microsoft documentation](https://dev.outlook.com/connectors/reference) will have the most up-to-date screenshots of the process.
+With the [upcoming retirement of Office 365 Connectors](https://devblogs.microsoft.com/microsoft365dev/retirement-of-office-365-connectors-within-microsoft-teams/), 
+this library has been updated to use Workflows. Follow the instructions in [this simple, short video](https://www.youtube.com/watch?v=jHTU_jUnswY) to set up the Workflow for your Teams channel. You can then get the webhook URL from the "When a Teams webhook request is received" step of the workflow (it's the auto-generated HTTP POST URL field, which has a handy 'copy' button next to it).
 
 ## Installation
 
@@ -33,10 +34,10 @@ import msteamsnotifiers
 msteamsnotifiers.default_webhook_url = '<your Microsoft webhook URL>'
 
 msteamsnotifiers.post_simple_teams_message('Hello channel!')
-msteamsnotifiers.post_simple_teams_message('[Markdown formatting](https://www.markdownguide.org/) is supported.]')
-```
+msteamsnotifiers.post_simple_teams_message('[Markdown formatting](https://www.markdownguide.org/) is supported.')
+msteamsnotifiers.post_simple_teams_message('This was sent using [msteamsnotifiers](https://pypi.org/project/msteamsnotifiers/)')
 
-If you want to send richer messages with sections, titles, and other features supported by MS Teams, the [`pymsteams`](https://pypi.org/project/pymsteams/) library makes this very easy.
+```
 
 
 ### Notifying a channel of an exception
@@ -123,6 +124,13 @@ kwargs: {kwargs}
 
 Releases
 --------
+### 0.2: 2024-07-18
+
+- Update to support the new data schema required by the Workflows app.
+  - [Office 365 Connectors are going away](https://devblogs.microsoft.com/microsoft365dev/retirement-of-office-365-connectors-within-microsoft-teams/)
+  - This version won't be compatible with O365 Connector webhooks you've previously set up. According to the link directly above, you won't be able to create new Connector webhooks after August 15th, 2024. Existing connector webhooks will stop working on October 1st, 2024. 
+- Removed dependency on `pymsteams` (an excellent library, *RIP*)
+
 ### 0.1: 2021-10-02
 
 - Initial release
